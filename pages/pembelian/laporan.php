@@ -22,52 +22,63 @@ $result = mysqli_query($conn, $query);
 ?>
 
 <!DOCTYPE html>
-<html>
+<html lang="id">
 
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Laporan Pembelian</title>
+    <link rel="stylesheet" href="<?= $base_url ?>assets/css/output.css">
 </head>
 
-<body>
-    <h2>Laporan Pembelian</h2>
-    <form method="GET" action="">
-        <label>Tanggal Mulai:</label>
-        <input type="date" name="tanggal_mulai" required>
-        <label>Tanggal Selesai:</label>
-        <input type="date" name="tanggal_selesai" required>
-        <label>Pilih Pemasok:</label>
-        <select name="kode_pemasok">
-            <option value="">Semua Pemasok</option>
-            <?php
-            $pemasokQuery = mysqli_query($conn, "SELECT * FROM pemasok");
-            while ($p = mysqli_fetch_assoc($pemasokQuery)) {
-                echo "<option value='{$p['kode_pemasok']}'>{$p['nama_pemasok']}</option>";
-            }
-            ?>
-        </select>
-        <button type="submit">Tampilkan</button>
-    </form>
+<body class="flex min-h-screen bg-gray-100">
+    <!-- Sidebar -->
+    <?php include "../../includes/sidebar.php"; ?>
 
-    <table border="1">
-        <tr>
-            <th>Nota</th>
-            <th>Tanggal</th>
-            <th>Pemasok</th>
-            <th>Total</th>
-            <th>Aksi</th>
-        </tr>
-        <?php while ($row = mysqli_fetch_assoc($result)) { ?>
-            <tr>
-                <td><?= $row['nota_beli'] ?></td>
-                <td><?= $row['tanggal_beli'] ?></td>
-                <td><?= $row['nama_pemasok'] ?></td>
-                <td>Rp<?= number_format($row['total_beli'], 0, ',', '.') ?></td>
-                <td><a target="_blank" href="lihat_nota.php?nota_beli=<?= $row['nota_beli'] ?>">Lihat Nota</a></td>
-            </tr>
-        <?php } ?>
-    </table>
+    <div class="flex-1 p-6 bg-white shadow-md">
+        <h2 class="mb-4 text-2xl font-bold">Laporan Pembelian</h2>
 
-    <button onclick="window.print()">Cetak Laporan</button>
+        <form method="GET" action="" class="flex flex-wrap gap-2 mb-4">
+            <input type="date" name="tanggal_mulai" required class="p-2 border rounded">
+            <input type="date" name="tanggal_selesai" required class="p-2 border rounded">
+            <select name="kode_pemasok" class="p-2 border rounded">
+                <option value="">Semua Pemasok</option>
+                <?php
+                $pemasokQuery = mysqli_query($conn, "SELECT * FROM pemasok");
+                while ($p = mysqli_fetch_assoc($pemasokQuery)) {
+                    echo "<option value='{$p['kode_pemasok']}'>{$p['nama_pemasok']}</option>";
+                }
+                ?>
+            </select>
+            <button type="submit" class="px-4 py-2 text-white bg-blue-500 rounded">Tampilkan</button>
+        </form>
+
+        <div class="overflow-x-auto">
+            <table class="w-full border border-collapse border-gray-300">
+                <thead>
+                    <tr class="bg-gray-200">
+                        <th class="p-2 border">Nota</th>
+                        <th class="p-2 border">Tanggal</th>
+                        <th class="p-2 border">Pemasok</th>
+                        <th class="p-2 border">Total</th>
+                        <th class="p-2 border">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php while ($row = mysqli_fetch_assoc($result)) { ?>
+                        <tr class="hover:bg-gray-100">
+                            <td class="p-2 border"><?= $row['nota_beli'] ?></td>
+                            <td class="p-2 border"><?= $row['tanggal_beli'] ?></td>
+                            <td class="p-2 border"><?= $row['nama_pemasok'] ?></td>
+                            <td class="p-2 border">Rp<?= number_format($row['total_beli'], 0, ',', '.') ?></td>
+                            <td class="p-2 border"><a target="_blank" href="lihat_nota.php?nota_beli=<?= $row['nota_beli'] ?>" class="text-blue-500 hover:underline">Lihat Nota</a></td>
+                        </tr>
+                    <?php } ?>
+                </tbody>
+            </table>
+        </div>
+        <!-- <button onclick="window.print()" class="px-4 py-2 mt-4 text-white bg-green-500 rounded hover:bg-green-600">Cetak Laporan</button> -->
+    </div>
 </body>
 
 </html>

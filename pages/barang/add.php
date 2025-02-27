@@ -13,85 +13,80 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     $query = "INSERT INTO gudang VALUES ('$kode', '$nama', '$satuan', '$harga_beli', '$harga_jual', '$jumlah_barang', '$jumlah_minimum', '$kode_pemasok', NOW())";
     if (mysqli_query($conn, $query)) {
-        echo "Data berhasil ditambahkan!";
         header("Location: index.php");
+        exit;
     } else {
-        echo "Gagal menambahkan data!";
+        echo "<p class='text-center text-red-500'>Gagal menambahkan data!</p>";
     }
 }
-?>
 
-<?php
 $query = "SELECT kode_pemasok, nama_pemasok FROM pemasok";
 $result = mysqli_query($conn, $query);
 ?>
 
-<h2>Tambah Barang</h2>
-<form method="POST">
-    <label for="kode_barang">Kode Barang:</label>
-    <input type="text" name="kode_barang" required><br>
+<!DOCTYPE html>
+<html lang="id">
 
-    <label for="nama_barang">Nama Barang:</label>
-    <input type="text" name="nama_barang" required><br>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tambah Barang</title>
+    <link rel="stylesheet" href="<?= $base_url ?>assets/css/output.css">
+</head>
 
-    <label for="satuan">Satuan:</label>
-    <input type="text" name="satuan" required><br>
+<body class="flex items-center justify-center min-h-screen bg-gray-100">
+    <div class="w-full max-w-md p-8 bg-white rounded-lg shadow-lg">
+        <h2 class="mb-4 text-2xl font-bold text-center">Tambah Barang</h2>
+        <form method="POST" class="space-y-4">
+            <input type="text" name="kode_barang" placeholder="Kode Barang" required class="w-full p-2 border rounded">
+            <input type="text" name="nama_barang" placeholder="Nama Barang" required class="w-full p-2 border rounded">
+            <input type="text" name="satuan" placeholder="Satuan" required class="w-full p-2 border rounded">
+            <input type="number" name="harga_beli" placeholder="Harga Beli" required class="w-full p-2 border rounded">
+            <input type="number" name="harga_jual" placeholder="Harga Jual" required class="w-full p-2 border rounded">
+            <input type="number" name="jumlah_barang" placeholder="Jumlah Barang" required class="w-full p-2 border rounded">
+            <input type="number" name="jumlah_minimum" placeholder="Jumlah Minimum" required class="w-full p-2 border rounded">
 
-    <label for="harga_beli">Harga Beli:</label>
-    <input type="number" name="harga_beli" required><br>
+            <select name="kode_pemasok" id="kode_pemasok" required class="w-full p-2 border rounded" onchange="getPemasokData()">
+                <option value="">-- Pilih Pemasok --</option>
+                <?php while ($row = mysqli_fetch_assoc($result)) { ?>
+                    <option value="<?= $row['kode_pemasok']; ?>">
+                        <?= $row['kode_pemasok']; ?> - <?= $row['nama_pemasok']; ?>
+                    </option>
+                <?php } ?>
+            </select>
 
-    <label for="harga_jual">Harga Jual:</label>
-    <input type="number" name="harga_jual" required><br>
+            <input type="text" id="nama_pemasok" placeholder="Nama Pemasok" readonly class="w-full p-2 bg-gray-200 border rounded">
+            <input type="text" id="orang_hubungi" placeholder="Orang yang Dihubungi" readonly class="w-full p-2 bg-gray-200 border rounded">
+            <input type="text" id="telepon_pemasok" placeholder="No Telepon" readonly class="w-full p-2 bg-gray-200 border rounded">
 
-    <label for="jumlah_barang">Jumlah Barang:</label>
-    <input type="number" name="jumlah_barang" required><br>
+            <button type="submit" class="w-full p-2 text-white bg-blue-600 rounded hover:bg-blue-700">Simpan</button>
+        </form>
+        <a href="index.php" class="block mt-4 text-center text-blue-600 hover:underline">Kembali</a>
+    </div>
 
-    <label for="jumlah_minimum">Jumlah Minimum:</label>
-    <input type="number" name="jumlah_minimum" required><br>
+    <script>
+        function getPemasokData() {
+            var kodePemasok = document.getElementById("kode_pemasok").value;
 
-    <label for="kode_pemasok">Kode Pemasok:</label>
-    <select name="kode_pemasok" id="kode_pemasok" required onchange="getPemasokData()">
-        <option value="">-- Pilih Pemasok --</option>
-        <?php
-        while ($row = mysqli_fetch_assoc($result)) {
-            echo "<option value='{$row['kode_pemasok']}'>{$row['kode_pemasok']} - {$row['nama_pemasok']}</option>";
+            if (kodePemasok) {
+                var xhr = new XMLHttpRequest();
+                xhr.open("GET", "get_pemasok.php?kode_pemasok=" + kodePemasok, true);
+                xhr.onreadystatechange = function() {
+                    if (xhr.readyState == 4 && xhr.status == 200) {
+                        var data = JSON.parse(xhr.responseText);
+                        document.getElementById("nama_pemasok").value = data.nama_pemasok;
+                        document.getElementById("orang_hubungi").value = data.orang_hubungi;
+                        document.getElementById("telepon_pemasok").value = data.telepon_pemasok;
+                    }
+                };
+                xhr.send();
+            } else {
+                document.getElementById("nama_pemasok").value = "";
+                document.getElementById("orang_hubungi").value = "";
+                document.getElementById("telepon_pemasok").value = "";
+            }
         }
-        ?>
-    </select><br>
+    </script>
+</body>
 
-    <label for="nama_pemasok">Nama Pemasok:</label>
-    <input type="text" id="nama_pemasok" readonly><br>
-
-    <label for="orang_hubungi">Orang yang Dihubungi:</label>
-    <input type="text" id="orang_hubungi" readonly><br>
-
-    <label for="telepon_pemasok">No Telepon:</label>
-    <input type="text" id="telepon_pemasok" readonly><br>
-
-    <button type="submit">Simpan</button>
-</form>
-<a href="index.php">Kembali</a>
-
-<script>
-    function getPemasokData() {
-        var kodePemasok = document.getElementById("kode_pemasok").value;
-
-        if (kodePemasok) {
-            var xhr = new XMLHttpRequest();
-            xhr.open("GET", "get_pemasok.php?kode_pemasok=" + kodePemasok, true);
-            xhr.onreadystatechange = function() {
-                if (xhr.readyState == 4 && xhr.status == 200) {
-                    var data = JSON.parse(xhr.responseText);
-                    document.getElementById("nama_pemasok").value = data.nama_pemasok;
-                    document.getElementById("orang_hubungi").value = data.orang_hubungi;
-                    document.getElementById("telepon_pemasok").value = data.telepon_pemasok;
-                }
-            };
-            xhr.send();
-        } else {
-            document.getElementById("nama_pemasok").value = "";
-            document.getElementById("orang_hubungi").value = "";
-            document.getElementById("telepon_pemasok").value = "";
-        }
-    }
-</script>
+</html>

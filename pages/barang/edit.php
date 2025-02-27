@@ -18,7 +18,7 @@ if (!$data) {
     exit;
 }
 
-// Ambil data pemasok untuk dropdown
+// Ambil data pemasok
 $pemasokQuery = "SELECT * FROM pemasok";
 $pemasokResult = mysqli_query($conn, $pemasokQuery);
 $pemasokList = [];
@@ -36,11 +36,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $jumlah_minimum = mysqli_real_escape_string($conn, $_POST['jumlah_minimum']);
     $kode_pemasok = mysqli_real_escape_string($conn, $_POST['kode_pemasok']);
 
-    // Ambil data pemasok berdasarkan kode yang dipilih
-    $nama_pemasok = $pemasokList[$kode_pemasok]['nama_pemasok'];
-    $orang_hubungi = $pemasokList[$kode_pemasok]['orang_hubungi'];
-    $telepon_pemasok = $pemasokList[$kode_pemasok]['telepon_pemasok'];
-
     $update = "UPDATE gudang SET 
                 nama_barang='$nama', 
                 satuan='$satuan', 
@@ -54,69 +49,66 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (mysqli_query($conn, $update)) {
         echo "<script>alert('Data berhasil diperbarui!'); window.location='index.php';</script>";
     } else {
-        echo "<script>alert('Gagal memperbarui data!');</script>";
+        echo "<p class='text-center text-red-500'>Gagal memperbarui data!</p>";
     }
 }
 ?>
 
-<h2>Edit Barang</h2>
-<form method="POST">
-    <label>Nama Barang:</label>
-    <input type="text" name="nama_barang" value="<?= htmlspecialchars($data['nama_barang']); ?>" required><br>
+<!DOCTYPE html>
+<html lang="id">
 
-    <label>Satuan:</label>
-    <input type="text" name="satuan" value="<?= htmlspecialchars($data['satuan']); ?>" required><br>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Barang</title>
+    <link rel="stylesheet" href="<?= $base_url ?>assets/css/output.css">
+</head>
 
-    <label>Harga Beli:</label>
-    <input type="number" name="harga_beli" value="<?= htmlspecialchars($data['harga_beli']); ?>" required><br>
+<body class="flex items-center justify-center min-h-screen bg-gray-100">
+    <div class="w-full max-w-md p-8 bg-white rounded-lg shadow-lg">
+        <h2 class="mb-4 text-2xl font-bold text-center">Edit Barang</h2>
+        <form method="POST" class="space-y-4">
+            <input type="text" name="nama_barang" value="<?= htmlspecialchars($data['nama_barang']); ?>" required class="w-full p-2 border rounded">
+            <input type="text" name="satuan" value="<?= htmlspecialchars($data['satuan']); ?>" required class="w-full p-2 border rounded">
+            <input type="number" name="harga_beli" value="<?= htmlspecialchars($data['harga_beli']); ?>" required class="w-full p-2 border rounded">
+            <input type="number" name="harga_jual" value="<?= htmlspecialchars($data['harga_jual']); ?>" required class="w-full p-2 border rounded">
+            <input type="number" name="jumlah_barang" value="<?= htmlspecialchars($data['jumlah_barang']); ?>" required class="w-full p-2 border rounded">
+            <input type="number" name="jumlah_minimum" value="<?= htmlspecialchars($data['jumlah_minimum']); ?>" required class="w-full p-2 border rounded">
 
-    <label>Harga Jual:</label>
-    <input type="number" name="harga_jual" value="<?= htmlspecialchars($data['harga_jual']); ?>" required><br>
+            <select name="kode_pemasok" id="kode_pemasok" required class="w-full p-2 border rounded" onchange="getPemasokData()">
+                <option value="">-- Pilih Pemasok --</option>
+                <?php foreach ($pemasokList as $kode => $pemasok) : ?>
+                    <option value="<?= $kode; ?>" <?= ($kode == $data['kode_pemasok']) ? 'selected' : ''; ?>>
+                        <?= $kode; ?> - <?= $pemasok['nama_pemasok']; ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
 
-    <label>Jumlah Barang:</label>
-    <input type="number" name="jumlah_barang" value="<?= htmlspecialchars($data['jumlah_barang']); ?>" required><br>
+            <input type="text" id="nama_pemasok" value="<?= htmlspecialchars($pemasokList[$data['kode_pemasok']]['nama_pemasok']); ?>" readonly class="w-full p-2 bg-gray-200 border rounded">
+            <input type="text" id="orang_hubungi" value="<?= htmlspecialchars($pemasokList[$data['kode_pemasok']]['orang_hubungi']); ?>" readonly class="w-full p-2 bg-gray-200 border rounded">
+            <input type="text" id="telepon_pemasok" value="<?= htmlspecialchars($pemasokList[$data['kode_pemasok']]['telepon_pemasok']); ?>" readonly class="w-full p-2 bg-gray-200 border rounded">
 
-    <label>Jumlah Minimum:</label>
-    <input type="number" name="jumlah_minimum" value="<?= htmlspecialchars($data['jumlah_minimum']); ?>" required><br>
+            <button type="submit" class="w-full p-2 text-white bg-blue-600 rounded hover:bg-blue-700">Update</button>
+        </form>
+        <a href="index.php" class="block mt-4 text-center text-blue-600 hover:underline">Kembali</a>
+    </div>
 
-    <label>Kode Pemasok:</label>
-    <select name="kode_pemasok" id="kode_pemasok" required>
-        <option value="">-- Pilih Pemasok --</option>
-        <?php foreach ($pemasokList as $kode => $pemasok) : ?>
-            <option value="<?= $kode; ?>" <?= ($kode == $data['kode_pemasok']) ? 'selected' : ''; ?>>
-                <?= $kode; ?> - <?= $pemasok['nama_pemasok']; ?>
-            </option>
-        <?php endforeach; ?>
-    </select><br>
+    <script>
+        let pemasokData = <?= json_encode($pemasokList); ?>;
 
-    <label>Nama Pemasok:</label>
-    <input type="text" id="nama_pemasok" value="<?= htmlspecialchars($pemasokList[$data['kode_pemasok']]['nama_pemasok']); ?>" readonly><br>
-
-    <label>Orang yang Dihubungi:</label>
-    <input type="text" id="orang_hubungi" value="<?= htmlspecialchars($pemasokList[$data['kode_pemasok']]['orang_hubungi']); ?>" readonly><br>
-
-    <label>Telepon Pemasok:</label>
-    <input type="text" id="telepon_pemasok" value="<?= htmlspecialchars($pemasokList[$data['kode_pemasok']]['telepon_pemasok']); ?>" readonly><br>
-
-    <button type="submit">Update</button>
-</form>
-
-<a href="index.php">Kembali</a>
-
-<script>
-    // Simpan data pemasok dalam JavaScript
-    let pemasokData = <?= json_encode($pemasokList); ?>;
-
-    document.getElementById("kode_pemasok").addEventListener("change", function() {
-        let kodePemasok = this.value;
-        if (pemasokData[kodePemasok]) {
-            document.getElementById("nama_pemasok").value = pemasokData[kodePemasok].nama_pemasok;
-            document.getElementById("orang_hubungi").value = pemasokData[kodePemasok].orang_hubungi;
-            document.getElementById("telepon_pemasok").value = pemasokData[kodePemasok].telepon_pemasok;
-        } else {
-            document.getElementById("nama_pemasok").value = "";
-            document.getElementById("orang_hubungi").value = "";
-            document.getElementById("telepon_pemasok").value = "";
+        function getPemasokData() {
+            let kodePemasok = document.getElementById("kode_pemasok").value;
+            if (pemasokData[kodePemasok]) {
+                document.getElementById("nama_pemasok").value = pemasokData[kodePemasok].nama_pemasok;
+                document.getElementById("orang_hubungi").value = pemasokData[kodePemasok].orang_hubungi;
+                document.getElementById("telepon_pemasok").value = pemasokData[kodePemasok].telepon_pemasok;
+            } else {
+                document.getElementById("nama_pemasok").value = "";
+                document.getElementById("orang_hubungi").value = "";
+                document.getElementById("telepon_pemasok").value = "";
+            }
         }
-    });
-</script>
+    </script>
+</body>
+
+</html>

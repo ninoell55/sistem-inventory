@@ -23,13 +23,29 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 }
 ?>
 
-<h2>Edit Pemasok</h2>
-<form method="POST">
-    <input type="text" name="nama_pemasok" value="<?= $data['nama_pemasok']; ?>" required><br>
-    <input type="text" name="alamat_pemasok" value="<?= $data['alamat_pemasok']; ?>" required><br>
-    <input type="text" name="kota_pemasok" value="<?= $data['kota_pemasok']; ?>" required><br>
-    <input type="text" name="telepon_pemasok" value="<?= $data['telepon_pemasok']; ?>" required><br>
-    <input type="text" name="orang_hubungi" value="<?= $data['orang_hubungi']; ?>" required><br>
-    <button type="submit">Update</button>
-</form>
-<a href="index.php">Kembali</a>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="<?= $base_url ?>assets/css/output.css">
+</head>
+
+<body class="flex items-center justify-center h-screen bg-gray-100">
+    <div class="w-full max-w-md p-8 bg-white rounded-lg shadow-lg">
+        <h2 class="mb-4 text-2xl font-bold text-center">Edit Pemasok</h2>
+        <form method="POST" class="space-y-4">
+            <input type="text" name="nama_pemasok" class="w-full p-2 border rounded" value="<?= $data['nama_pemasok']; ?>" required><br>
+            <input type="text" name="alamat_pemasok" class="w-full p-2 border rounded" value="<?= $data['alamat_pemasok']; ?>" required><br>
+            <input type="text" name="kota_pemasok" class="w-full p-2 border rounded" value="<?= $data['kota_pemasok']; ?>" required><br>
+            <input type="text" name="telepon_pemasok" class="w-full p-2 border rounded" value="<?= $data['telepon_pemasok']; ?>" required><br>
+            <input type="text" name="orang_hubungi" class="w-full p-2 border rounded" value="<?= $data['orang_hubungi']; ?>" required><br>
+            <button type="submit" class="w-full p-2 text-white bg-blue-600 rounded hover:bg-blue-700">Update</button>
+        </form>
+        <a href="index.php" class="block mt-4 text-center text-blue-600 hover:underline">Kembali</a>
+    </div>
+</body>
+
+</html>

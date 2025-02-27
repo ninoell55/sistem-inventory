@@ -34,49 +34,62 @@ $result = mysqli_query($conn, $query);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Laporan Data Gudang</title>
+    <link rel="stylesheet" href="<?= $base_url ?>assets/css/output.css">
 </head>
 
-<body>
-    <h2>Laporan Data Gudang</h2>
-    <form method="GET">
-        <input type="text" name="search" placeholder="Cari Kode/Nama Barang" value="<?= htmlspecialchars($search); ?>"><br><br>
+<body class="flex bg-gray-100">
+    <!-- Sidebar -->
+    <?php include '../../includes/sidebar.php'; ?>
 
-        <label for="start_date">Tanggal Mulai:</label>
-        <input type="date" name="start_date" value="<?= htmlspecialchars($dateFrom); ?>"><br><br>
+    <!-- Konten Utama -->
+    <div class="flex-1 p-6">
+        <div class="p-6 bg-white rounded-lg shadow-lg">
+            <h2 class="mb-4 text-2xl font-bold">Laporan Data Gudang</h2>
 
-        <label for="end_date">Tanggal Selesai:</label>
-        <input type="date" name="end_date" value="<?= htmlspecialchars($dateTo); ?>"><br><br>
+            <form method="GET" class="flex flex-wrap gap-4 mb-4">
+                <input type="text" name="search" placeholder="Cari Kode/Nama Barang" value="<?= htmlspecialchars($search); ?>" class="w-full p-2 border rounded md:w-1/3">
+                <input type="date" name="start_date" value="<?= htmlspecialchars($dateFrom); ?>" class="w-full p-2 border rounded md:w-1/4">
+                <input type="date" name="end_date" value="<?= htmlspecialchars($dateTo); ?>" class="w-full p-2 border rounded md:w-1/4">
+                <button type="submit" class="px-4 py-2 text-white bg-blue-500 rounded hover:bg-blue-600">Cari</button>
+            </form>
 
-        <button type="submit">Cari</button>
-    </form>
+            <div class="overflow-x-auto">
+                <table class="w-full border border-collapse border-gray-300">
+                    <thead>
+                        <tr class="bg-gray-200">
+                            <th class="p-2 border">Kode Barang</th>
+                            <th class="p-2 border">Nama Barang</th>
+                            <th class="p-2 border">Satuan</th>
+                            <th class="p-2 border">Jumlah Barang</th>
+                            <th class="p-2 border">Jumlah Minimum</th>
+                            <th class="p-2 border">Harga Beli</th>
+                            <th class="p-2 border">Harga Jual</th>
+                            <th class="p-2 border">Pemasok</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php while ($row = mysqli_fetch_assoc($result)) { ?>
+                            <tr class="border">
+                                <td class="p-2 border"><?= $row['kode_barang']; ?></td>
+                                <td class="p-2 border"><?= $row['nama_barang']; ?></td>
+                                <td class="p-2 border"><?= $row['satuan']; ?></td>
+                                <td class="p-2 border"><?= $row['jumlah_barang']; ?></td>
+                                <td class="p-2 border"><?= $row['jumlah_minimum']; ?></td>
+                                <td class="p-2 border">Rp <?= number_format($row['harga_beli'], 2); ?></td>
+                                <td class="p-2 border">Rp <?= number_format($row['harga_jual'], 2); ?></td>
+                                <td class="p-2 border"><?= $row['nama_pemasok']; ?></td>
+                            </tr>
+                        <?php } ?>
+                    </tbody>
+                </table>
+            </div>
 
-    <table border="1">
-        <tr>
-            <th>Kode Barang</th>
-            <th>Nama Barang</th>
-            <th>Satuan</th>
-            <th>Jumlah Barang</th>
-            <th>Jumlah Minimum</th>
-            <th>Harga Beli</th>
-            <th>Harga Jual</th>
-            <th>Pemasok</th>
-        </tr>
-        <?php while ($row = mysqli_fetch_assoc($result)) { ?>
-            <tr>
-                <td><?= $row['kode_barang']; ?></td>
-                <td><?= $row['nama_barang']; ?></td>
-                <td><?= $row['satuan']; ?></td>
-                <td><?= $row['jumlah_barang']; ?></td>
-                <td><?= $row['jumlah_minimum']; ?></td>
-                <td><?= number_format($row['harga_beli'], 2); ?></td>
-                <td><?= number_format($row['harga_jual'], 2); ?></td>
-                <td><?= $row['nama_pemasok']; ?></td>
-            </tr>
-        <?php } ?>
-    </table>
-
-    <a href="export_pdf.php">Export PDF</a> |
-    <a href="export_csv.php">Export CSV</a>
+            <div class="mt-4">
+                <!-- <a href="export_pdf.php" class="px-4 py-2 text-white bg-red-500 rounded hover:bg-red-600">Export PDF</a>
+                <a href="export_csv.php" class="px-4 py-2 text-white bg-green-500 rounded hover:bg-green-600">Export CSV</a> -->
+            </div>
+        </div>
+    </div>
 </body>
 
 </html>

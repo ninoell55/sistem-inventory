@@ -6,7 +6,7 @@ $konsumenQuery = "SELECT * FROM konsumen";
 $konsumenResult = mysqli_query($conn, $konsumenQuery);
 
 // Ambil data barang dari gudang
-$barangQuery = "SELECT * FROM gudang WHERE jumlah_barang > 0"; // Hanya tampilkan barang yang tersedia
+$barangQuery = "SELECT * FROM gudang WHERE jumlah_barang > 0";
 $barangResult = mysqli_query($conn, $barangQuery);
 
 // Ambil nota terakhir dengan format yang benar
@@ -14,14 +14,11 @@ $query = "SELECT nota_jual FROM penjualan WHERE nota_jual LIKE 'NJ-%' ORDER BY C
 $result = mysqli_query($conn, $query);
 
 if ($row = mysqli_fetch_assoc($result)) {
-    // Ambil angka dari nota terakhir dan tambah 1
     $lastNotaNumber = intval(substr($row['nota_jual'], 3)) + 1;
 } else {
-    // Jika belum ada transaksi, mulai dari 1
     $lastNotaNumber = 1;
 }
 
-// Format nota baru dengan padding 3 digit
 $nota_jual = "NJ-" . str_pad($lastNotaNumber, 3, "0", STR_PAD_LEFT);
 ?>
 
@@ -32,72 +29,96 @@ $nota_jual = "NJ-" . str_pad($lastNotaNumber, 3, "0", STR_PAD_LEFT);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Form Penjualan Barang</title>
+    <link rel="stylesheet" href="<?= $base_url ?>assets/css/output.css">
 </head>
 
-<body>
+<body class="flex bg-gray-100">
 
-    <h2>Form Penjualan Barang</h2>
-    <form method="POST" action="process.php">
-        <label>Pilih Konsumen:</label>
-        <select name="kode_konsumen" required>
-            <option value="">-- Pilih Konsumen --</option>
-            <?php while ($konsumen = mysqli_fetch_assoc($konsumenResult)) { ?>
-                <option value="<?= $konsumen['kode_konsumen']; ?>"><?= $konsumen['nama_konsumen']; ?></option>
-            <?php } ?>
-        </select><br>
+    <!-- Sidebar -->
+    <?php include '../../includes/sidebar.php'; ?>
 
-        <label>Nota Penjualan:</label>
-        <input type="text" name="nota_jual" value="<?php echo $nota_jual; ?>" readonly><br>
-
-        <table id="table-barang">
-            <tr>
-                <th>Kode Barang</th>
-                <th>Nama Barang</th>
-                <th>Satuan</th>
-                <th>Stok</th>
-                <th>Harga Jual</th>
-                <th>Jumlah</th>
-                <th>Subtotal</th>
-                <th>Aksi</th>
-            </tr>
-            <tr>
-                <td>
-                    <select name="kode_barang[]" class="kode_barang" required>
-                        <option value="">-- Pilih Barang --</option>
-                        <?php while ($barang = mysqli_fetch_assoc($barangResult)) { ?>
-                            <option value="<?= $barang['kode_barang']; ?>"
-                                data-nama="<?= $barang['nama_barang']; ?>"
-                                data-satuan="<?= $barang['satuan']; ?>"
-                                data-harga="<?= $barang['harga_jual']; ?>"
-                                data-stok="<?= $barang['jumlah_barang']; ?>">
-                                <?= $barang['kode_barang']; ?>
+    <!-- Konten Utama -->
+    <div class="flex-1 p-6">
+        <div class="p-6 bg-white rounded-lg shadow-lg">
+            <h2 class="mb-4 text-2xl font-bold">Form Penjualan Barang</h2>
+            <form method="POST" action="process.php" class="space-y-4">
+                <div>
+                    <label class="block font-medium">Pilih Konsumen:</label>
+                    <select name="kode_konsumen" required class="w-full p-2 border rounded">
+                        <option value="">-- Pilih Konsumen --</option>
+                        <?php while ($konsumen = mysqli_fetch_assoc($konsumenResult)) { ?>
+                            <option value="<?= $konsumen['kode_konsumen']; ?>">
+                                <?= $konsumen['nama_konsumen']; ?>
                             </option>
                         <?php } ?>
                     </select>
-                </td>
-                <td><input type="text" name="nama_barang[]" class="nama_barang" readonly></td>
-                <td><input type="text" name="satuan[]" class="satuan" readonly></td>
-                <td><input type="number" name="stok[]" class="stok" readonly></td>
-                <td><input type="number" name="harga_jual[]" class="harga_jual" readonly></td>
-                <td><input type="number" name="jumlah_jual[]" class="jumlah_jual" required></td>
-                <td><input type="number" name="subtotal[]" class="subtotal" readonly></td>
-                <td><button type="button" class="hapus">Hapus</button></td>
-            </tr>
-        </table>
+                </div>
 
-        <button type="button" id="tambah-barang">Tambah Barang</button><br>
+                <div>
+                    <label class="block font-medium">Nota Penjualan:</label>
+                    <input type="text" name="nota_jual" value="<?php echo $nota_jual; ?>" readonly class="w-full p-2 border rounded">
+                </div>
 
-        <p>Total Penjualan: <span id="total_display">0</span></p>
-        <input type="hidden" name="total_penjualan" id="total_penjualan" value="0">
+                <div class="overflow-x-auto">
+                    <table class="w-full border border-collapse border-gray-300">
+                        <thead>
+                            <tr class="bg-gray-200">
+                                <th class="p-2 border">Kode Barang</th>
+                                <th class="p-2 border">Nama Barang</th>
+                                <th class="p-2 border">Satuan</th>
+                                <th class="p-2 border">Stok</th>
+                                <th class="p-2 border">Harga Jual</th>
+                                <th class="p-2 border">Jumlah</th>
+                                <th class="p-2 border">Subtotal</th>
+                                <th class="p-2 border">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-barang">
+                            <tr>
+                                <td>
+                                    <select name="kode_barang[]" class="w-full p-2 border rounded kode_barang" required>
+                                        <option value=""> Pilih Barang </option>
+                                        <?php while ($barang = mysqli_fetch_assoc($barangResult)) { ?>
+                                            <option value="<?= $barang['kode_barang']; ?>"
+                                                data-nama="<?= $barang['nama_barang']; ?>"
+                                                data-satuan="<?= $barang['satuan']; ?>"
+                                                data-harga="<?= $barang['harga_jual']; ?>"
+                                                data-stok="<?= $barang['jumlah_barang']; ?>">
+                                                <?= $barang['kode_barang']; ?>
+                                            </option>
+                                        <?php } ?>
+                                    </select>
+                                </td>
+                                <td><input type="text" name="nama_barang[]" class="w-full p-2 border rounded nama_barang" readonly></td>
+                                <td><input type="text" name="satuan[]" class="w-full p-2 border rounded satuan" readonly></td>
+                                <td><input type="number" name="stok[]" class="w-full p-2 border rounded stok" readonly></td>
+                                <td><input type="number" name="harga_jual[]" class="w-full p-2 border rounded harga_jual" readonly></td>
+                                <td><input type="number" name="jumlah_jual[]" class="w-full p-2 border rounded jumlah_jual" required></td>
+                                <td><input type="number" name="subtotal[]" class="w-full p-2 border rounded subtotal" readonly></td>
+                                <td><button type="button" class="p-2 text-white bg-red-500 rounded hapus">Hapus</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
 
-        <label>Bayar:</label>
-        <input type="number" id="bayar" name="bayar" required><br>
+                <button type="button" id="tambah-barang" class="px-4 py-2 text-white bg-blue-500 rounded">Tambah Barang</button>
+                <div class="mt-4">
+                    <p class="font-semibold">Total Penjualan: <span id="total_display">0</span></p>
+                    <input type="hidden" name="total_penjualan" id="total_penjualan" value="0">
+                </div>
+                <div>
+                    <label class="block font-medium">Bayar:</label>
+                    <input type="number" id="bayar" name="bayar" required class="w-full p-2 border rounded">
+                </div>
+                <div>
+                    <label class="block font-medium">Kembalian:</label>
+                    <input type="number" id="kembalian" name="kembalian" readonly class="w-full p-2 border rounded">
+                </div>
+                <button type="submit" class="px-4 py-2 text-white bg-green-500 rounded">Simpan Penjualan</button>
+            </form>
+        </div>
+    </div>
 
-        <label>Kembalian:</label>
-        <input type="number" id="kembalian" name="kembalian" readonly><br>
-
-        <button type="submit">Simpan Penjualan</button>
-    </form>
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
@@ -180,7 +201,6 @@ $nota_jual = "NJ-" . str_pad($lastNotaNumber, 3, "0", STR_PAD_LEFT);
             });
         });
     </script>
-
 </body>
 
 </html>

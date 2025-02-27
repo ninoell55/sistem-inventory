@@ -35,77 +35,46 @@ $resultDetail = mysqli_query($conn, $queryDetail);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nota Pembelian</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-
-        th,
-        td {
-            border: 1px solid black;
-            padding: 10px;
-            text-align: left;
-        }
-
-        .container {
-            width: 80%;
-            margin: auto;
-            padding: 20px;
-            border: 1px solid black;
-        }
-
-        .hidden-print {
-            margin-top: 20px;
-        }
-
-        @media print {
-            .hidden-print {
-                display: none;
-            }
-        }
-    </style>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
-<body>
-    <div class="container">
-        <h2>Nota Pembelian</h2>
-        <p><strong>Nota:</strong> <?= $dataPembelian['nota_beli'] ?></p>
-        <p><strong>Tanggal:</strong> <?= $dataPembelian['tanggal_beli'] ?></p>
-        <p><strong>Pemasok:</strong> <?= $dataPembelian['nama_pemasok'] ?></p>
+<body class="flex items-center justify-center min-h-screen bg-gray-100">
+    <div class="w-full max-w-2xl p-6 bg-white rounded-lg shadow-lg">
+        <h2 class="mb-4 text-2xl font-bold text-center">Nota Pembelian</h2>
+        <div class="mb-4">
+            <p><strong>Nota:</strong> <?= $dataPembelian['nota_beli'] ?></p>
+            <p><strong>Tanggal:</strong> <?= $dataPembelian['tanggal_beli'] ?></p>
+            <p><strong>Pemasok:</strong> <?= $dataPembelian['nama_pemasok'] ?></p>
+        </div>
 
-        <table>
-            <tr>
-                <th>Kode Barang</th>
-                <th>Nama Barang</th>
-                <th>Satuan</th>
-                <th>Harga Beli</th>
-                <th>Jumlah</th>
-                <th>Subtotal</th>
-            </tr>
-            <?php while ($row = mysqli_fetch_assoc($resultDetail)) { ?>
-                <tr>
-                    <td><?= $row['kode_barang'] ?></td>
-                    <td><?= $row['nama_barang'] ?></td>
-                    <td><?= $row['satuan'] ?></td>
-                    <td>Rp<?= number_format($row['harga_beli'], 0, ',', '.') ?></td>
-                    <td><?= $row['jumlah_beli'] ?></td>
-                    <td>Rp<?= number_format($row['total_beli'], 0, ',', '.') ?></td>
+        <table class="w-full border border-collapse border-gray-300">
+            <thead>
+                <tr class="bg-gray-200">
+                    <th class="p-2 border">Kode Barang</th>
+                    <th class="p-2 border">Nama Barang</th>
+                    <th class="p-2 border">Satuan</th>
+                    <th class="p-2 border">Harga</th>
+                    <th class="p-2 border">Jumlah</th>
                 </tr>
-            <?php } ?>
+            </thead>
+            <tbody>
+                <?php while ($row = mysqli_fetch_assoc($resultDetail)) { ?>
+                    <tr class="hover:bg-gray-100">
+                        <td class="p-2 border"><?= $row['kode_barang'] ?></td>
+                        <td class="p-2 border"><?= $row['nama_barang'] ?></td>
+                        <td class="p-2 border"><?= $row['satuan'] ?></td>
+                        <td class="p-2 border">Rp<?= number_format($row['harga_beli'], 0, ',', '.') ?></td>
+                        <td class="p-2 border"><?= $row['jumlah_beli'] ?></td>
+                    </tr>
+                <?php } ?>
+            </tbody>
         </table>
 
-        <h3>Total: Rp<?= number_format($dataPembelian['total_beli'], 0, ',', '.') ?></h3>
+        <h3 class="mt-4 text-xl font-bold">Total: Rp<?= number_format($dataPembelian['total_beli'], 0, ',', '.') ?></h3>
 
-        <div class="hidden-print">
-            <button onclick="window.print()">Print Nota</button>
-            <button onclick="window.close()">Tutup</button>
+        <div class="mt-4 space-x-2">
+            <button onclick="window.print()" class="px-4 py-2 text-white bg-blue-500 rounded hover:bg-blue-600">Print Nota</button>
+            <button onclick="window.close()" class="px-4 py-2 text-white bg-red-500 rounded hover:bg-red-600">Tutup</button>
         </div>
     </div>
 

@@ -1,0 +1,19 @@
+{
+  "dependencies": {
+    "@tailwindcss/cli": "^4.0.8"
+  },
+  "name": "sistem_inventory",
+  "version": "1.0.0",
+  "main": "index.js",
+  "devDependencies": {
+    "tailwindcss": "^4.0.8"
+  },
+  "scripts": {
+    "build": "npx tailwindcss -i ./assets/css/input.css -o ./assets/css/output.css",
+    "dev": "npx tailwindcss -i ./assets/css/input.css -o ./assets/css/output.css --watch"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}
